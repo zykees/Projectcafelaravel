@@ -277,6 +277,13 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.card-header select').forEach(select => {
+        select.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+});
 function toggleStatus(productId) {
     const tr = document.querySelector(`tr[data-product-id="${productId}"]`);
     const statusBadge = tr.querySelector('.status-badge');

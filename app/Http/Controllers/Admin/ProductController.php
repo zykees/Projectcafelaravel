@@ -22,30 +22,30 @@ class ProductController extends Controller
         $query = Product::with('category');
 
         // Filter by category
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
+        if ($request->filled('category_id')) {
+    $query->where('category_id', $request->category_id);
+}
 
         // Filter by status
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Filter by price range
-        if ($request->has('price_min')) {
+        if ($request->filled('price_min')) {
             $query->where('price', '>=', $request->price_min);
         }
-        if ($request->has('price_max')) {
+        if ($request->filled('price_max')) {
             $query->where('price', '<=', $request->price_max);
         }
 
         // Search by name or description
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+if ($request->filled('search')) {
+    $search = $request->search;
+    $query->where(function($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%")
+          ->orWhere('description', 'like', "%{$search}%");
+    });
         }
 
         // Sort by
@@ -133,6 +133,7 @@ class ProductController extends Controller
                 ->withInput()
                 ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
         }
+       
     }
 
     public function show(Product $product)
@@ -240,6 +241,7 @@ class ProductController extends Controller
         $product->save();
 
         return response()->json([
+            
             'success' => true,
             'status' => $product->status,
             'status_text' => $product->status_text,

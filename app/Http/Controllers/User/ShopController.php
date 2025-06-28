@@ -15,35 +15,32 @@ use App\Http\Controllers\User\UserOrderController;
 
 class ShopController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Query products with category relationship
-        $query = Product::with('category')
-            ->where('status', 'available') // แสดงเฉพาะสินค้าที่พร้อมขาย
-            ->where('stock', '>', 0); // แสดงเฉพาะสินค้าที่มีในสต็อก
+public function index(Request $request)
+{
+    $query = \App\Models\Product::query();  
 
-        // Filter by category
-        if ($request->has('category')) {
-            $query->where('category_id', $request->category);
-        }
-
-        // Search products
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Get categories for sidebar
-        $categories = Category::where('status', 'active')->get();
-
-        // Get products with pagination
-        $products = $query->latest()->paginate(9);
-
-        return view('User.shop.index', compact('products', 'categories'));
+    // Filter by category (เฉพาะถ้ามีเลือก)
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->category);
     }
+
+    // Filter by search (ถ้ามี)
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    // เงื่อนไขอื่นๆ เช่น สินค้าพร้อมขาย
+    $query->where('status', 'available');
+
+    $products = $query->paginate(16)->appends($request->query());
+    $categories = \App\Models\Category::where('status', 'active')->get();
+
+    return view('User.shop.index', compact('products', 'categories'));
+}
 
     public function show(Product $product)
     {

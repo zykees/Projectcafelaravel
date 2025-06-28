@@ -49,7 +49,7 @@
                     <label for="image" class="form-label">Image</label>
                     @if($gallery->image)
                         <div class="mb-2">
-                            <img src="{{ $gallery->getImageUrl() }}" alt="Current Image" class="img-thumbnail" style="max-height: 200px">
+                            <img src="{{ $gallery->image }}" alt="Current Image" class="img-thumbnail" style="max-height: 200px">
                         </div>
                     @endif
                     <input type="file" class="form-control @error('image') is-invalid @enderror" 

@@ -38,7 +38,7 @@ public function index()
         $totalSales = \App\Models\Order::where('status', 'completed')->get()->sum(function($order) {
     return $order->calculated_total;
 });
-        $totalBookingAmount = \App\Models\PromotionBooking::where('payment_status', 'paid')->sum('payment_amount');
+        $totalBookingAmount = \App\Models\PromotionBooking::where('payment_status', 'paid')->sum('final_price');
         $totalOrders = \App\Models\Order::where('status', 'completed')->count();
         $totalPromotionBookings = \App\Models\PromotionBooking::count();
         $activePromotions = \App\Models\Promotion::where('status', 'active')->count();
@@ -54,11 +54,11 @@ public function index()
             });
 
         $bookingChart = \App\Models\PromotionBooking::where('payment_status', 'paid')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get()
-            ->groupBy(function($booking) {
-                return $booking->created_at->format('Y-m-d');
-            });
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->get()
+        ->groupBy(function($booking) {
+            return $booking->created_at->format('Y-m-d');
+        });
 
         $labels = [];
         $salesData = [];
@@ -71,7 +71,7 @@ public function index()
             return $order->calculated_total;
         })
         : 0;
-    $bookingData[] = isset($bookingChart[$date]) ? $bookingChart[$date]->sum('payment_amount') : 0;
+    $bookingData[] = isset($bookingChart[$date]) ? $bookingChart[$date]->sum('final_price') : 0;
 }
 
         return view('admin.reports.index', [

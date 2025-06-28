@@ -243,6 +243,7 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Image preview functionality
@@ -269,80 +270,86 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveCategoryBtn = document.getElementById('saveCategoryBtn');
     const spinner = saveCategoryBtn.querySelector('.spinner-border');
 
-    async function saveCategory() {
-        try {
-            // Show loading state
-            saveCategoryBtn.disabled = true;
-            spinner.classList.remove('d-none');
+   async function saveCategory() {
+    try {
+        saveCategoryBtn.disabled = true;
+        spinner.classList.remove('d-none');
+        categoryForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        categoryForm.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
 
-            // Reset previous errors
-            categoryForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            categoryForm.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        const formData = new FormData(categoryForm);
 
-            // Get form data
-            const formData = new FormData(categoryForm);
+        const response = await fetch('{{ route('admin.categories.store') }}', {
+    method: 'POST',
+    headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+    },
+    body: formData
+});
 
-            // Send request
-            const response = await fetch('{{ route('admin.categories.store') }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            });
+       let data;
+try {
+    data = await response.json();
+    console.log(data); // ดูว่ามี category หรือไม่
+} catch (e) {
+    data = {};
+}
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-            }
-
-            // Add new category to select
-            const categorySelect = document.getElementById('category_id');
-            const option = new Option(data.category.name, data.category.id, true, true);
-            categorySelect.appendChild(option);
-
-            // Show success message
-            Swal.fire({
-                icon: 'success',
-                title: 'สำเร็จ!',
-                text: 'เพิ่มหมวดหมู่เรียบร้อยแล้ว',
-                timer: 1500
-            });
-
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(categoryModal);
-            modal.hide();
-            categoryForm.reset();
-
-        } catch (error) {
-            console.error('Error:', error);
-            
-            if (error.response?.status === 422) {
-                // Validation errors
-                const errors = error.response.data.errors;
-                Object.keys(errors).forEach(field => {
+        if (!response.ok) {
+            if (response.status === 422 && data.errors) {
+                Object.keys(data.errors).forEach(field => {
                     const input = document.getElementById(`category_${field}`);
                     if (input) {
                         input.classList.add('is-invalid');
-                        input.nextElementSibling.textContent = errors[field][0];
+                        input.nextElementSibling.textContent = data.errors[field][0];
                     }
                 });
-            } else {
-                // General error
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ข้อผิดพลาด!',
-                    text: error.message
-                });
+                return;
             }
-        } finally {
-            // Reset loading state
-            saveCategoryBtn.disabled = false;
-            spinner.classList.add('d-none');
+            Swal.fire({
+                icon: 'error',
+                title: 'ข้อผิดพลาด!',
+                text: data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
+            });
+            return;
         }
+
+       // Add new category to select
+if (data.category) {
+    const categorySelect = document.getElementById('category_id');
+    const option = document.createElement('option');
+    option.value = data.category.id;
+    option.text = data.category.name;
+    option.selected = true;
+    categorySelect.appendChild(option);
+    categorySelect.value = data.category.id;
+    categorySelect.dispatchEvent(new Event('change'));
+}
+
+        // Show success message in modal, then close modal after confirm
+        Swal.fire({
+            icon: 'success',
+            title: 'เพิ่มหมวดหมู่สำเร็จ!',
+            text: 'หมวดหมู่ใหม่ถูกเพิ่มและเลือกให้เรียบร้อยแล้ว',
+            confirmButtonText: 'ตกลง'
+        }).then(() => {
+            const modal = bootstrap.Modal.getInstance(categoryModal);
+            modal.hide();
+            categoryForm.reset();
+        });
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'ข้อผิดพลาด!',
+            text: error.message || 'เกิดข้อผิดพลาด'
+        });
+    } finally {
+        saveCategoryBtn.disabled = false;
+        spinner.classList.add('d-none');
     }
+}
 
     saveCategoryBtn.addEventListener('click', saveCategory);
 

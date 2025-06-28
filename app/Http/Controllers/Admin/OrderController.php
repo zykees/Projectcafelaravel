@@ -21,25 +21,25 @@ class OrderController extends Controller
         $query = Order::with(['user', 'items.product', 'promotion']);
 
         // Filter by status
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
+       if ($request->filled('status')) {
+    $query->where('status', $request->status);
+}
 
         // Filter by payment status
-        if ($request->has('payment_status')) {
-            $query->where('payment_status', $request->payment_status);
-        }
+        if ($request->filled('payment_status')) {
+    $query->where('payment_status', $request->payment_status);
+}
 
         // Filter by date range
-        if ($request->has('date_from')) {
+        if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
-        if ($request->has('date_to')) {
+        if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         // Search by order code or customer name
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('order_code', 'like', "%{$search}%")

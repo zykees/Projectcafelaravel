@@ -10,15 +10,33 @@ use App\Models\PromotionBooking;
 
 class PromotionController extends Controller
 {
-   public function index()
-    {
-        $promotions = Promotion::where('status', 'active')
-            ->where('ends_at', '>', now())
-            ->latest()
-            ->paginate(12);
+  public function index(Request $request)
+{
+    $query = Promotion::where('status', 'active')
+        ->where('ends_at', '>', now());
 
-        return view('User.promotion.index', compact('promotions'));
+    // Filter: ค้นหาด้วยชื่อโปรโมชั่น
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where('title', 'like', "%{$search}%");
     }
+
+    // Filter: ประเภท (discount, special)
+    if ($request->filled('type')) {
+        $query->where('type', $request->type);
+    }
+
+    // Sort
+    if ($request->get('sort') === 'popular') {
+        $query->withCount('bookings')->orderByDesc('bookings_count');
+    } else {
+        $query->orderByDesc('starts_at');
+    }
+
+    $promotions = $query->paginate(12)->appends($request->query());
+
+    return view('User.promotion.index', compact('promotions'));
+}
 
      public function show(Promotion $promotion)
     {

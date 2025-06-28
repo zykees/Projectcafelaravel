@@ -46,52 +46,52 @@
     <div class="card shadow mb-4">
         <!-- Filters -->
         <div class="card-header py-3">
-            <form action="{{ route('admin.orders.index') }}" method="GET" class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <select class="form-select" name="status">
-                        <option value="">ทุกสถานะ</option>
-                        <option value="{{ Order::STATUS_PENDING }}" {{ request('status') == Order::STATUS_PENDING ? 'selected' : '' }}>รอดำเนินการ</option>
-                        <option value="{{ Order::STATUS_PROCESSING }}" {{ request('status') == Order::STATUS_PROCESSING ? 'selected' : '' }}>กำลังดำเนินการ</option>
-                        <option value="{{ Order::STATUS_COMPLETED }}" {{ request('status') == Order::STATUS_COMPLETED ? 'selected' : '' }}>เสร็จสิ้น</option>
-                        <option value="{{ Order::STATUS_CANCELLED }}" {{ request('status') == Order::STATUS_CANCELLED ? 'selected' : '' }}>ยกเลิก</option>
-                    </select>
-                </div>
+        <form action="{{ route('admin.orders.index') }}" method="GET" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">ทุกสถานะ</option>
+                    <option value="{{ Order::STATUS_PENDING }}" {{ request('status') == Order::STATUS_PENDING ? 'selected' : '' }}>รอดำเนินการ</option>
+                    <option value="{{ Order::STATUS_PROCESSING }}" {{ request('status') == Order::STATUS_PROCESSING ? 'selected' : '' }}>กำลังดำเนินการ</option>
+                    <option value="{{ Order::STATUS_COMPLETED }}" {{ request('status') == Order::STATUS_COMPLETED ? 'selected' : '' }}>เสร็จสิ้น</option>
+                    <option value="{{ Order::STATUS_CANCELLED }}" {{ request('status') == Order::STATUS_CANCELLED ? 'selected' : '' }}>ยกเลิก</option>
+                </select>
+            </div>
 
-                <div class="col-auto">
-                    <select class="form-select" name="payment_status">
-                        <option value="">สถานะการชำระเงิน</option>
-                        <option value="{{ Order::PAYMENT_PENDING }}" {{ request('payment_status') == Order::PAYMENT_PENDING ? 'selected' : '' }}>รอชำระเงิน</option>
-                        <option value="{{ Order::PAYMENT_PAID }}" {{ request('payment_status') == Order::PAYMENT_PAID ? 'selected' : '' }}>ชำระแล้ว</option>
-                        <option value="{{ Order::PAYMENT_FAILED }}" {{ request('payment_status') == Order::PAYMENT_FAILED ? 'selected' : '' }}>ชำระไม่สำเร็จ</option>
-                    </select>
-                </div>
+            <div class="col-auto">
+                <select class="form-select" name="payment_status" onchange="this.form.submit()">
+                    <option value="">สถานะการชำระเงิน</option>
+                    <option value="{{ Order::PAYMENT_PENDING }}" {{ request('payment_status') == Order::PAYMENT_PENDING ? 'selected' : '' }}>รอชำระเงิน</option>
+                    <option value="{{ Order::PAYMENT_PAID }}" {{ request('payment_status') == Order::PAYMENT_PAID ? 'selected' : '' }}>ชำระแล้ว</option>
+                    <option value="{{ Order::PAYMENT_FAILED }}" {{ request('payment_status') == Order::PAYMENT_FAILED ? 'selected' : '' }}>ชำระไม่สำเร็จ</option>
+                </select>
+            </div>
 
-                <div class="col-auto">
-                    <div class="input-group">
-                        <input type="date" class="form-control" name="date_from" value="{{ request('date_from') }}" placeholder="วันที่เริ่มต้น">
-                        <span class="input-group-text">ถึง</span>
-                        <input type="date" class="form-control" name="date_to" value="{{ request('date_to') }}" placeholder="วันที่สิ้นสุด">
-                    </div>
+            <div class="col-auto">
+                <div class="input-group">
+                    <input type="date" class="form-control" name="date_from" value="{{ request('date_from') }}" placeholder="วันที่เริ่มต้น">
+                    <span class="input-group-text">ถึง</span>
+                    <input type="date" class="form-control" name="date_to" value="{{ request('date_to') }}" placeholder="วันที่สิ้นสุด">
                 </div>
+            </div>
 
-                <div class="col-auto">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" value="{{ request('search') }}" placeholder="ค้นหา...">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+            <div class="col-auto">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" value="{{ request('search') }}" placeholder="ค้นหา...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
+            </div>
 
-                <div class="col-auto">
-                    <select class="form-select" name="sort">
-                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>ล่าสุด</option>
-                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>เก่าสุด</option>
-                        <option value="total_desc" {{ request('sort') == 'total_desc' ? 'selected' : '' }}>ยอดรวมมาก-น้อย</option>
-                        <option value="total_asc" {{ request('sort') == 'total_asc' ? 'selected' : '' }}>ยอดรวมน้อย-มาก</option>
-                    </select>
-                </div>
-            </form>
+            <div class="col-auto">
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>ล่าสุด</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>เก่าสุด</option>
+                    <option value="total_desc" {{ request('sort') == 'total_desc' ? 'selected' : '' }}>ยอดรวมมาก-น้อย</option>
+                    <option value="total_asc" {{ request('sort') == 'total_asc' ? 'selected' : '' }}>ยอดรวมน้อย-มาก</option>
+                </select>
+            </div>
+        </form>
         </div>
 
        <div class="card-body">
@@ -185,12 +185,20 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto submit on filter change
-    document.querySelectorAll('.card-header select').forEach(select => {
+    // Auto submit on filter change (select)
+    document.querySelectorAll('form select[name="status"], form select[name="payment_status"], form select[name="sort"]').forEach(select => {
         select.addEventListener('change', function() {
-            this.closest('form').submit();
+            this.form.submit();
         });
     });
+
+    // Auto submit on date change
+    document.querySelectorAll('form input[type="date"]').forEach(input => {
+        input.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
 
     // Handle date range inputs
     const dateFrom = document.querySelector('input[name="date_from"]');

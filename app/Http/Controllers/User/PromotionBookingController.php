@@ -220,5 +220,5 @@ class PromotionBookingController extends Controller
                     ->withInput();
     }
 }
-
+ 
 }

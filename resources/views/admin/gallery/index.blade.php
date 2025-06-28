@@ -41,7 +41,7 @@
                 @forelse($galleries as $gallery)
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="{{ $gallery->getImageUrl() }}" class="card-img-top" alt="{{ $gallery->title }}">
+                            <img src="{{ $gallery->image }}" class="card-img-top" alt="{{ $gallery->title }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $gallery->title }}</h5>
                                 <p class="card-text">{{ Str::limit($gallery->description, 100) }}</p>

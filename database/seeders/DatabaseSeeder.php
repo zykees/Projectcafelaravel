@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Promotion;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 
@@ -16,9 +17,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             UserSeeder::class,
+            CategorySeeder::class,
             ProductSeeder::class,
             PromotionSeeder::class,
-            BookingSeeder::class,
+            PromotionBookingSeeder::class,
+            OrderSeeder::class,
             OrderSeeder::class
         ]);
     }

@@ -1,9 +1,10 @@
 <?php
+
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Gallery extends Model
 {
@@ -13,33 +14,24 @@ class Gallery extends Model
         'title',
         'description',
         'image',
-        'status'
+        'status',
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s'
-    ];  
-
-    const STATUS_ACTIVE = 'active';
-    const STATUS_INACTIVE = 'inactive';
-
-        public function getCreatedAtAttribute($value)
-    {
-        return $value ? Carbon::parse($value)->setTimezone('Asia/Bangkok') : null;
-    }
-
-    public function getUpdatedAtAttribute($value)
-    {
-        return $value ? Carbon::parse($value)->setTimezone('Asia/Bangkok') : null;
-    }
+    // Accessor สำหรับดึง URL รูปจาก Cloudinary
     public function getImageUrl(): string
     {
-        return $this->image ? asset('storage/' . $this->image) : asset('images/no-image.png');
+        if (!empty($this->image)) {
+            // Cloudinary public_id จะได้ url แบบนี้
+            return 'https://res.cloudinary.com/' . env('CLOUDINARY_CLOUD_NAME') . '/image/upload/' . $this->image;
+        }
+        return asset('images/no-image.png');
     }
-
     public function getStatusColor(): string
-    {
-        return $this->status === self::STATUS_ACTIVE ? 'success' : 'danger';
-    }
+{
+    return match ($this->status) {
+        'active' => 'success',    // ตัวอย่าง: ใช้สีเขียว
+        'inactive' => 'secondary',// ตัวอย่าง: ใช้สีเทา
+        default => 'light',       // ตัวอย่าง: สีอ่อน
+    };
+}
 }

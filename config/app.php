@@ -170,9 +170,10 @@ return [
         App\Providers\RouteServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Darryldecode\Cart\CartServiceProvider::class
-    ])->toArray(),
-
+        Darryldecode\Cart\CartServiceProvider::class,
+        cloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class
+        ])->toArray(),
+        'debug_env_cloudinary' => env('CLOUDINARY_CLOUD_NAME'),
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -188,7 +189,8 @@ return [
         // 'Example' => App\Facades\Example::class,
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class, // แก้ไขบรรทัดนี้
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-        'Cart' => Darryldecode\Cart\Facades\CartFacade::class
-    ])->toArray(),
+        'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
+        'Cloudinary' => cloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::class,
+        ])->toArray(),
 
 ];

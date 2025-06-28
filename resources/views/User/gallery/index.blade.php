@@ -10,7 +10,7 @@
             @if($image->status === 'active')
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="{{ $image->getImageUrl() }}" class="card-img-top" alt="{{ $image->title }}">
+                        <img src="{{ $image->image }}" class="card-img-top" alt="{{ $image->title }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ $image->title }}</h5>
                             <p class="card-text text-muted">{{ Str::limit($image->description, 80) }}</p>

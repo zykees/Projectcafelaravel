@@ -10,15 +10,69 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 class PromotionBookingController extends Controller
 {
-    public function index()
+   public function index(Request $request)
 {
-    $bookings = PromotionBooking::with(['promotion', 'user'])
-        ->latest()
-        ->paginate(10);
+    $query = PromotionBooking::with(['promotion', 'user']);
 
-    return view('admin.promotion-bookings.index', compact('bookings'));
+    // Filter: สถานะการจอง
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Filter: สถานะการชำระเงิน
+    if ($request->filled('payment_status')) {
+        $query->where('payment_status', $request->payment_status);
+    }
+
+    // Filter: กิจกรรม (promotion)
+    if ($request->filled('promotion_id')) {
+        $query->where('promotion_id', $request->promotion_id);
+    }
+
+    // Filter: วันที่จอง
+    if ($request->filled('date_from')) {
+        $query->whereDate('created_at', '>=', $request->date_from);
+    }
+    if ($request->filled('date_to')) {
+        $query->whereDate('created_at', '<=', $request->date_to);
+    }
+
+    // Filter: ค้นหา (booking code, ชื่อผู้จอง, เบอร์, email)
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('booking_code', 'like', "%{$search}%")
+              ->orWhereHas('user', function($uq) use ($search) {
+                  $uq->where('name', 'like', "%{$search}%")
+                     ->orWhere('email', 'like', "%{$search}%");
+              })
+              ->orWhereHas('promotion', function($pq) use ($search) {
+                  $pq->where('title', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    // Sort
+    switch ($request->get('sort', 'latest')) {
+        case 'oldest':
+            $query->orderBy('created_at', 'asc');
+            break;
+        case 'total_desc':
+            $query->orderBy('final_price', 'desc');
+            break;
+        case 'total_asc':
+            $query->orderBy('final_price', 'asc');
+            break;
+        default:
+            $query->orderBy('created_at', 'desc');
+            break;
+    }
+
+    $bookings = $query->paginate(15)->appends($request->query());
+    $promotions = \App\Models\Promotion::orderBy('title')->get();
+
+    return view('admin.promotion-bookings.index', compact('bookings', 'promotions'));
 }
-
     public function show(PromotionBooking $booking)
     {
         return view('admin.promotion-bookings.show', compact('booking'));
@@ -90,4 +144,17 @@ class PromotionBookingController extends Controller
 
     return response()->download($path);
 }
+   public function updateStatus(Request $request, PromotionBooking $booking)
+{
+    $request->validate([
+        'status' => 'required|in:pending,confirmed,completed,cancelled'
+    ]);
+    $booking->status = $request->status;
+    $booking->save();
+
+    return redirect()->route('admin.promotion-bookings.index')
+        ->with('success', 'อัปเดตสถานะการจองเรียบร้อยแล้ว');
+}
+
+
 }

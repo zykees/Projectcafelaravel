@@ -50,31 +50,23 @@ class CategoryController extends Controller
     }
 
     public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:categories',
-                'description' => 'nullable|string|max:1000',
-                'status' => 'required|in:active,inactive'
-            ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255|unique:categories',
+        'description' => 'nullable|string|max:1000',
+        'status' => 'required|in:active,inactive'
+    ]);
+    $validated['slug'] = \Illuminate\Support\Str::slug($request->name);
 
-            $validated['slug'] = Str::slug($request->name);
+    $category = \App\Models\Category::create($validated);
 
-            DB::beginTransaction();
-            Category::create($validated);
-            DB::commit();
+    if ($request->ajax()) {
+    return response()->json(['category' => $category]);
+}
 
-            return redirect()
-                ->route('admin.categories.index')
-                ->with('success', 'เพิ่มหมวดหมู่สำเร็จ');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()
-                ->withInput()
-                ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
-        }
-    }
+    return redirect()->route('admin.products.create')
+        ->with('success', 'เพิ่มหมวดหมู่สำเร็จ');
+}
 
     public function show(Category $category)
     {

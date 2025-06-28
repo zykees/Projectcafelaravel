@@ -79,6 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function() {
             'promotions' => PromotionController::class,
             'news' => NewsController::class,
             'gallery' => GalleryController::class,
+            
         ]);
             Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
 
@@ -102,7 +103,8 @@ Route::prefix('admin')->name('admin.')->group(function() {
         Route::get('promotion-bookings/{booking}/payment-slip', 
             [AdminPromotionBookingController::class, 'downloadPaymentSlip'])
             ->name('promotion-bookings.download-slip');
-
+        Route::patch('promotion-bookings/{booking}/update-status', [AdminPromotionBookingController::class, 'updateStatus'])->name('promotion-bookings.update-status');
+Route::patch('promotion-bookings/{booking}/update-payment-status', [AdminPromotionBookingController::class, 'updatePaymentStatus'])->name('promotion-bookings.update-payment-status');
         // Status Updates
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.update-status');
