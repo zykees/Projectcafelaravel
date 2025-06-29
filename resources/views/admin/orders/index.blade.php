@@ -212,7 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
             dateFrom.max = this.value;
         });
     }
-});
 
 function cancelOrder(orderId) {
     if (confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกออเดอร์นี้?')) {

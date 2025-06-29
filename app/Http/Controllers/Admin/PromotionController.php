@@ -20,19 +20,49 @@ class PromotionController extends Controller
         $this->middleware('auth:admin');
     }
 
-   public function index(Request $request)
+ public function index(Request $request)
 {
-    $query = Promotion::withCount(['bookings as total_bookings', 'bookings as confirmed_bookings' => function($query) {
-        $query->where('status', 'confirmed');
-    }]);
+    $query = Promotion::query();
 
     // Filter by status
-    if ($request->has('status')) {
+    if ($request->filled('status')) {
         $query->where('status', $request->status);
     }
 
-    $promotions = $query->latest()->paginate(10);
-    return view('admin.promotions.index', compact('promotions'));
+    // Filter by is_featured (cast เป็น int)
+    if ($request->filled('is_featured')) {
+        $query->where('is_featured', (int)$request->is_featured);
+    }
+
+    // Filter by start date
+    if ($request->filled('starts_at')) {
+        $query->whereDate('starts_at', '>=', $request->starts_at);
+    }
+
+    // Filter by end date
+    if ($request->filled('ends_at')) {
+        $query->whereDate('ends_at', '<=', $request->ends_at);
+    }
+
+    // Filter by search (ชื่อกิจกรรม)
+    if ($request->filled('search')) {
+        $search = trim($request->search);
+        $query->where(function($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    $promotions = $query->latest()->paginate(10)->appends($request->query());
+
+    $stats = [
+        'total'    => Promotion::count(),
+        'active'   => Promotion::where('status', 'active')->count(),
+        'inactive' => Promotion::where('status', 'inactive')->count(),
+        'featured' => Promotion::where('is_featured', 1)->count(),
+    ];
+
+    return view('admin.promotions.index', compact('promotions', 'stats'));
 }
 
     public function create()
